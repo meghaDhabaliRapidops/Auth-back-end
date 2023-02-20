@@ -44,33 +44,17 @@ const StudentSchema = new Schema({
 
 //generating tokens
 StudentSchema.methods.generateAuthToken = async function() {
-  console.log('Hey')
-  console.log("this._id", this._id);
     try {
         const token = jwt.sign({_id: this._id.toString()}, process.env.SECRET_KEY);
-        console.log("token", token);
         this.tokens = this.tokens.concat({token:token});
         await this.save();
         return token;
         
     } catch (error) {
-        // res.send("throwing an error");
-        console.log("inside error");
+        res.send("throwing an error");
         console.log(error);
     }
 }
-
-// StudentSchema.methods.generateAuthToken = async function() {
-//     try {
-//         const token = jwt.sign({_id: this._id.toString()}, "mynameismeghadhabaliIamsoftwaredeveloper");
-//         console.log(token);
-        
-//     } catch (error) {
-//         res.send("throwing an error");
-//         console.log(error);
-//     }
-// }
-
 
 const Student = mongoose.model("student", StudentSchema);
 

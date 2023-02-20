@@ -5,14 +5,10 @@ const auth = require("../middleware/auth");
 
 // user login
 router.post("/login", function (req, res, next) {
-  console.log("inside login 123");
-  console.log(req.body);
 
-  //  Student.findOne({ email: req.body.email, password: req.body.password })
   Student.findOne({ email: req.body.email })
     .then(async function (student) {
       if (student != null) {
-        console.log("inside if of login");
         const token = await student.generateAuthToken();
 
         res.cookie("jwt", token, {
@@ -25,7 +21,6 @@ router.post("/login", function (req, res, next) {
         googleAuthentication(req, res, next);
       } else {
         res.send(400, "Something went wrong");
-        console.log("insideelse");
       }
     })
     .catch(next);
@@ -34,16 +29,11 @@ router.post("/login", function (req, res, next) {
 //user logout
 router.get("/logout", auth, async function (req, res) {
   try {
-    // console.log("req.user", req.user);
-
     req.user.tokens = req.user.tokens.filter((item) => {
       return item.token !== req.token;
     });
 
     res.clearCookie("jwt");
-    //console.log("logout....");
-    // await req.user.save();
-    // res.send("logged out");
     res.status(200).send("Logged out successfully");
   } catch (error) {
     res.status(500).send(error);
@@ -70,19 +60,13 @@ router.get("/students/:id", function (req, res, next) {
 
 // add a new student to database
 router.post("/students", async function (req, res, next) {
-  console.log("inside post function");
-  //console.log(req);
-  //   console.log(req.body);
 
   /////To check email already registered
   Student.findOne({ email: req.body.email })
     .then(async function (student) {
-      console.log("student", student);
       if (student != null) {
-        console.log("inside if of login");
         res.send(400, "User already exist.");
       } else {
-        console.log("insideelse");
         const studentData = new Student({
           fullName: req.body.fullName,
           email: req.body.email,
@@ -93,9 +77,7 @@ router.post("/students", async function (req, res, next) {
           zip: req.body.zip,
           date: req.body.date,
         });
-        ////console.log("student....", studentData);
         const token = await studentData.generateAuthToken();
-        console.log("generated token", token);
 
         //res.cookie(name, value, [options])
 
@@ -106,7 +88,6 @@ router.post("/students", async function (req, res, next) {
 
         Student.create(studentData)
           .then(function (student) {
-            // console.log(student);
             res.send(student);
           })
           .catch(next);
@@ -117,8 +98,6 @@ router.post("/students", async function (req, res, next) {
 
 // update a student in the database
 router.put("/students/:id", function (req, res, next) {
-  console.log("inside put function");
-  console.log(req.params.id);
   Student.findOneAndUpdate({ _id: req.params.id }, req.body).then(function (
     student
   ) {
@@ -135,31 +114,13 @@ router.delete("/students/:id", function (req, res, next) {
   });
 });
 
-// const jwt = require("jsonwebtoken");
-
-// const createToken = async() => {
-//     //{} is playload - unique
-//     //  jwt.sign({playload}, "secreate-key")
-
-//     const token = await jwt.sign({_id: "6385b4d01a7e8140403a4242"}, "mynameismeghadhabaliIamasoftwaredeveloper", {
-//       expiresIn: "2 seconds"
-//     });
-//     console.log(token);
-
-//     const userVerify =await jwt.verify(token, "mynameismeghadhabaliIamasoftwaredeveloper");
-//     console.log(userVerify);
-//   }
-//   createToken();
 
 async function googleAuthentication(req, res, next) {
-  console.log("ins=die google function");
   const studentData = new Student({
     email: req.body.email,
     fullName: req.body.name,
   });
-  ////console.log("student....", studentData);
   const token = await studentData.generateAuthToken();
-  console.log("generated token-----", token);
 
   //res.cookie(name, value, [options])
 
@@ -170,9 +131,6 @@ async function googleAuthentication(req, res, next) {
 
   Student.create(studentData)
     .then(function (student) {
-      console.log("student created...");
-      console.log(student);
-
       res.send(student);
     })
     .catch(next);
