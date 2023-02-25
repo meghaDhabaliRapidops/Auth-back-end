@@ -6,7 +6,7 @@ const auth = require("../middleware/auth");
 // user login
 router.post("/login", function (req, res, next) {
 
-  Student.findOne({ email: req.body.email })
+  Student.findOne({ email: req.body.email, password: req.body.password })
     .then(async function (student) {
       if (student != null) {
         const token = await student.generateAuthToken();
